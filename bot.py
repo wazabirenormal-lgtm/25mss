@@ -33,7 +33,7 @@ from obf_detect import detect_obf
 is_localhost=False
 
 ssl_context = ssl.create_default_context(cafile=certifi.where())
-ownerid = 1123674631266639914
+ownerid = 1134927235908911125
 ApiToken = ""
 intents = discord.Intents.all()
 
@@ -1631,23 +1631,44 @@ async def getlinkcontent(text):
     if not url:
         return
     urls = [
-        "[https://pastebin.com/](https://pastebin.com/)",
-        "[https://raw.githubusercontent.com/](https://raw.githubusercontent.com/)",
-        "[https://gist.githubusercontent.com/](https://gist.githubusercontent.com/)",
-        "[https://pastefy.app/](https://pastefy.app/)",
-        "[https://paste.ee/r/](https://paste.ee/r/)",
-        "[https://rawscripts.net/raw/](https://rawscripts.net/raw/)",
-        "[https://scriptblox.com/script/](https://scriptblox.com/script/)",
-        "[https://pandadevelopment.net/virtual/file/](https://pandadevelopment.net/virtual/file/)"
+        "https://pastebin.com/",
+        "https://raw.githubusercontent.com/",
+        "https://gist.githubusercontent.com/",
+        "https://pastefy.app/",
+        "https://paste.ee/r/",
+        "https://rawscripts.net/raw/",
+        "https://scriptblox.com/script/",
+        "https://pandadevelopment.net/virtual/file/"
     ]
     
     urls_regex=[
-        r"[https://github.com/](https://github.com/)[A-z0-9_.-]+/[A-z0-9_.-]+/raw/"
+        r"https://github\.com/[A-z0-9_.-]+/[A-z0-9_.-]+/raw/"
     ]
     if any(url.startswith(url_match)for url_match in urls) or any(re.match(urls_regex_match,url)for urls_regex_match in urls_regex):
         try:
             return (await asyncget(
-                url.replace("[https://scriptblox.com/script/](https://scriptblox.com/script/)","[https://scriptblox.com/script/](https://scriptblox.com/script/)"),
+                url,
+                headers={
+                    "User-Agent":"Roblox/WinInetRobloxApp/0.673.0.6730711 (GlobalDist; RobloxDirectDownload)"
+                }
+            )).replace(bypass.myip,"1.1.1.1")
+        except Exception as er:
+            print("GetKnownError:",er)
+            return False
+    else:
+        try:
+            return (await asyncget(
+                url,
+                headers={
+                    "User-Agent":"Roblox/WinInetRobloxApp/0.673.0.6730711 (GlobalDist; RobloxDirectDownload)"
+                },
+                proxy="http://45.86.52.0:12323", 
+                proxy_auth=aiohttp.BasicAuth("14aad0db837a7", "cb9d8ef717"),
+            )).replace("45.86.52.0","0.0.0.0")
+        except Exception as er:
+            print("GetUnKError:",er)
+            return False
+  url.replace("[https://scriptblox.com/script/](https://scriptblox.com/script/)","[https://scriptblox.com/script/](https://scriptblox.com/script/)"),
                 headers={
                     "User-Agent":"Roblox/WinInetRobloxApp/0.673.0.6730711 (GlobalDist; RobloxDirectDownload)"
                 }
@@ -1927,10 +1948,12 @@ class MyClient(discord.Client):
         licensing.init(client)
         print("Logged in!")
         print(f"Connected to {len(self.guilds)} servers")
-        # Sync slash commands to every guild the bot is in (makes them appear instantly)
         sync_results = []
         for guild in self.guilds:
             try:
+                # Copia los comandos globales a este servidor localmente
+                self.tree.copy_global_to(guild=guild)
+                
                 await self.tree.sync(guild=guild)
                 msg = f"✅ Slash commands synced to guild: {guild.name} ({guild.id})"
                 print(msg)
@@ -2113,7 +2136,7 @@ class MyClient(discord.Client):
                 else:
                     repliedmsg = await msg.channel.fetch_message(msg.reference.message_id)
                     strcheck = repliedmsg.content
-                res = requests.post('[https://vector.profanity.dev](https://vector.profanity.dev)', headers={'Content-Type': 'application/json'}, json={'message':strcheck}).json()
+                res = requests.post('https://vector.profanity.dev', headers={'Content-Type': 'application/json'}, json={'message':strcheck}).json()
                 if 'isProfanity' in res and 'flaggedFor' in res:
                     await msg.reply(f'This is marked as a profanity!\nScore: {round(float(res["score"])*100,2)}%\nFlagged Word: {res["flaggedFor"]}')
                 elif 'isProfanity' in res and res['isProfanity'] == False:
