@@ -82,22 +82,15 @@ def format_name(raw_name):
 def build_verdict(name, confidence, gap):
     display = format_name(name)
 
-    # Tier 1 — very high confidence, clear gap
     if confidence > 80 and gap > 30:
         opener = random.choice(CERTAIN_OPENERS)
         middle = random.choice(CERTAIN_MIDDLES)
-
-    # Tier 2 — solid confidence or decent gap
     elif confidence > 60 or gap > 15:
         opener = random.choice(SURE_OPENERS)
         middle = random.choice(SURE_MIDDLES)
-
-    # Tier 3 — weak confidence but something is there
     elif confidence > 35 or gap > 8:
         opener = random.choice(UNSURE_OPENERS)
         middle = random.choice(UNSURE_MIDDLES)
-
-    # Tier 4 — basically random
     else:
         opener = random.choice(CLUELESS_OPENERS)
         middle = random.choice(CLUELESS_MIDDLES)
@@ -126,6 +119,27 @@ def detect_advanced(content, model_data):
     ]
     results.sort(key=lambda x: x["confidence"], reverse=True)
     return results
+
+
+# ── FUNCIÓN QUE TU BOT NECESITA IMPORTAR ───────────────────────────
+_model_cache = None
+
+def detect_obf(content):
+    global _model_cache
+    if _model_cache is None:
+        if os.path.exists(MODEL_FILE):
+            _model_cache = joblib.load(MODEL_FILE)
+        else:
+            return {}
+    try:
+        pipeline = _model_cache['pipeline']
+        probs = pipeline.predict_proba([content[:30000]])[0]
+        classes = pipeline.classes_
+        # Devuelve el diccionario ordenado de probabilidades (0.0 a 1.0) que espera bot.py
+        return {classes[i]: float(probs[i]) for i in range(len(classes))}
+    except Exception as e:
+        print(f"Error en detect_obf: {e}")
+        return {}
 
 
 def main():
@@ -175,3 +189,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
