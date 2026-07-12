@@ -1875,7 +1875,7 @@ class MyClient(discord.Client):
         if msg.author.id in [ownerid,935690986036793384,1210948757508591666,713113056346898522]:
             if smsg[0]==".u":
                 print("ah yes")
-                bans = [ban async for msg.guild.bans()]
+                bans = [ban async for ban in msg.guild.bans()]
                 if not bans:
                     await msg.reply("No banned users.")
                     return
