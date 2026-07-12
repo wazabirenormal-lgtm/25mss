@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import time # yeah 
 import requests
-from onlyfans import onlyfans,fansly,discord_reply
+# from onlyfans import onlyfans,fansly,discord_reply
 import threading
 from shutil import move as file_move
 import tempfile
