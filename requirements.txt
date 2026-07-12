@@ -4,4 +4,4 @@ aiohttp
 requests
 Pillow
 certifi
-
+joblib
