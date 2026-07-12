@@ -1,0 +1,7 @@
+discord.py
+python-dotenv
+aiohttp
+requests
+Pillow
+certifi
+
