@@ -885,7 +885,7 @@ def _25ms_detect(content):
         r"return [A-z0-9_]+\([0-9A-z_]+\(\),[A-z0-9,_\{\}\)\(]+\)": "ib2 (or similar)",
         r"newproxy,...metatable,...metatable,select,":"prometheus",
         r"\(\[\[This file was protected with MoonSec V3[A-z9_#\s]+\]\]\):gsub\('\.\+', \(function\([A-z0-9_]+\) [A-z0-9_]+":"moonsec v3",
-        r"local v0=string\.char;local v1=string\.byte;local v2=string.sub;local v3=bit32 or bit ;local v4=v3\.bxor;local v5=table\.concat;local v6=table\.insert;local function v7":"luaobfuscator.com string enc"
+        r"local v0=string\.char;local v1=string\.byte;local v2=string\.sub;local v3=bit32 or bit ;local v4=v3\.bxor;local v5=table\.concat;local v6=table\.insert;local function v7":"luaobfuscator.com string enc"
     }
     for pattern, result in regexes.items():
         if re.findall(pattern,content):
@@ -1449,7 +1449,7 @@ headers = {
     "sec-fetch-site": "same-origin",
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
     "x-discord-locale": "en-US",
-    "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE0My4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTQzLjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiIiLCJyZWZlcnJpbmdfZG9tYWluIjoiIiwicmVmZXJyZXJfY3VycmVudCI6IiIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6IiIsInJlbGVhc2VfY2hhbm5lbCI6InN0YWJsZSIsImNsaWVudF9idWlsZF9udW1iZXIiOjQ4MDU4NSwiY2xpZW50X2V2ZW50X3NvdXJjZSI6bnVsbCwiaGFzX2NsaWVudF9tb2RzIjpmYWxzZSwiY2xpZW50X2xhdW5jaF9pZCI6IjIyMzE2M2ZkLWFjZjEtNDBhNS04MTI3LTViNzg4YjZhYzc2ZiIsImxhdW5jaF9zaWduYXR1cmUiOiI4Yjc1YWRhMC1kMjU0LTQwODctOGI1Ni0yMzA0YTQzZTE1ZjMiLCJjbGllbnRfYXBwX3N0YXRlIjoiZm9jdXNlZCIsImNsaWVudF9oZWFydGJlYXRfc2Vzc2lvbl9pZCI6IjA2YmVjZDNhLTZmNTItNGNjMC1hNjVjLTQyNzI2YTA3NTBkMiJ9"
+    "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE0My4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTQzLjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiIiLCJyZWZlcnJpbmdfZG9tYWluIjoiIiwicmVmZXJyJpbmdfZG9tYWluX2N1cnJlbnQiOiIiLCJyZWZlcnJpbmdfZG9tYWluX2N1cnJlbnQiOiIiLCJyZWxlYXNlX2NoYW5uZWwiOiJzdGFibGUiLCJjbGllbnRfYnVpbGRfbnVtYmVyIjoxNDgwNTg1LCJjbGllbnRfZXZlbnRfc291cmNlIjpudWxsLCJoYXNfY2xpZW50X21vZHMiOmZhbHNlLCJjbGllbnRfbGF1bmNoX2lkIjoiMjIzMTYzZmQtYWNmMS00MGE1LTgxMjctNWI3ODhiNmFjNzZmIiwibGF1bmNoX3NpZ25hdHVyZSI6IjhiNzVhZGEwLWQyNTQtNDA4Ny04YjU2LTIzMDRhNDNlMTVmMyIsImNsaWVudF9hcHBfc3RhdGUiOiJmb2N1c2VkIiwiY2xpZW50X2hlYXJ0YmVhdF9zZXNzaW9uX2lkIjoiMDZiZWNkM2EtNmY1Mi00Y2MwLWE2NWMtNDI3MjZhMDc1MGQyIn0="
 }
 
 async def getmsgcounts(user_id):
@@ -1496,47 +1496,55 @@ try:
 except FileNotFoundError:
     print("⚠️ oracle_keys.json no encontrado, iniciando vacío.")
 
-real_command_role_id = None
+# Per-guild settings for role and allowed channel (supports multiple servers)
+guild_settings = {}
 try:
-    with open("real_command_role.json", "r") as f:
-        real_command_role_id = loads(f.read())
-except Exception:
-    print("⚠️ real_command_role.json not found or invalid, starting empty.")
+    guild_settings = loads(open("guild_settings.json").read())
+except FileNotFoundError:
+    print("⚠️ guild_settings.json no encontrado, iniciando vacío.")
 
-allowed_l_channel_id = None
-try:
-    with open("allowed_l_channel.json", "r") as f:
-        allowed_l_channel_id = loads(f.read())
-except Exception:
-    print("⚠️ allowed_l_channel.json not found, starting empty.")
+def save_guild_settings():
+    try:
+        with open("guild_settings.json", "w") as f:
+            f.write(dumps(guild_settings))
+    except Exception as e:
+        print(f"Error saving guild_settings: {e}")
 
-def has_real_command_access(user_id: int) -> bool:
+def has_real_command_access(user_id: int, guild=None) -> bool:
     if user_id in [ownerid, 527548038173032478, 713113056346898522]:
         return True
-    roles = get_roles(user_id)
-    if real_command_role_id and any(getattr(r, 'id', None) == real_command_role_id for r in roles):
-        return True
+    # Check per-guild configured role if guild provided
+    if guild is not None:
+        gid = guild.id
+        if gid in guild_settings:
+            role_id = guild_settings[gid].get("role_id")
+            if role_id:
+                member = guild.get_member(user_id)
+                if member and any(getattr(r, 'id', None) == role_id for r in member.roles):
+                    return True
+    # Fallback: check main guild or any guild for the special donator/paid role
+    roles = get_roles(user_id, guild=guild)
     if any(getattr(r, 'id', None) == 1373857675497963601 for r in roles):
         return True
     return False
 
-def save_real_role(role_id: int):
-    global real_command_role_id
-    real_command_role_id = role_id
+def save_real_role(guild_id: int, role_id: int):
+    if guild_id not in guild_settings:
+        guild_settings[guild_id] = {}
+    guild_settings[guild_id]["role_id"] = role_id
     try:
-        with open("real_command_role.json", "w") as f:
-            f.write(dumps(real_command_role_id))
+        save_guild_settings()
     except Exception as e:
-        print(f"Error saving real_command_role: {e}")
+        print(f"Error saving real_command_role for guild {guild_id}: {e}")
 
-def save_allowed_l_channel(channel_id: int):
-    global allowed_l_channel_id
-    allowed_l_channel_id = channel_id
+def save_allowed_l_channel(guild_id: int, channel_id: int):
+    if guild_id not in guild_settings:
+        guild_settings[guild_id] = {}
+    guild_settings[guild_id]["channel_id"] = channel_id
     try:
-        with open("allowed_l_channel.json", "w") as f:
-            f.write(dumps(allowed_l_channel_id))
+        save_guild_settings()
     except Exception as e:
-        print(f"Error saving allowed_l_channel: {e}")
+        print(f"Error saving allowed_l_channel for guild {guild_id}: {e}")
 
 class dumpConfig(View):
     def __init__(self, user):
@@ -2096,17 +2104,31 @@ class MyClient(discord.Client):
                 else:
                     await msg.reply('Error.')
                     
+        # .l access check in specific channel (main server channel 1351444142852411454)
         if msg.channel.id == 1351444142852411454 and re.findall(r"^\.l(\s|http|`|$)",msg.content):
             if msg.author.id in [ownerid,527548038173032478,713113056346898522]:
                 pass
-            elif has_real_command_access(msg.author.id):
+            elif has_real_command_access(msg.author.id, msg.guild):
                 return await softerror(msg,"Use this in dms or <#1313254604657524807>")
             else:
                 return await softerror(msg,"Put `.gg/25ms` in your status and use `.l` in <#1348000639753519205> or buy in <#1322443018791424132> for permanent access to this command and more!",15)
+        
+        # Determine if we can run real commands (.l, .dump, etc) in this guild/channel
+        allowed_l_channel_id = None
+        if msg.guild and msg.guild.id in guild_settings:
+            allowed_l_channel_id = guild_settings[msg.guild.id].get("channel_id")
+        
         allowed_channels = [1348000639753519205,1368868223268687942,1462641847787847791]
         if allowed_l_channel_id:
             allowed_channels.append(allowed_l_channel_id)
-        if msg.channel.id in allowed_channels or msg.author.id in [ownerid,527548038173032478,713113056346898522] or has_real_command_access(msg.author.id):
+        
+        can_run_real = (
+            msg.author.id in [ownerid,527548038173032478,713113056346898522] or
+            has_real_command_access(msg.author.id, msg.guild) or
+            (allowed_l_channel_id is not None and msg.channel.id == allowed_l_channel_id)
+        )
+        
+        if msg.channel.id in allowed_channels or can_run_real:
             if msg.content.startswith(".dump"): 
                 result, filename = await luafilehandler(msg,"dump.lua","./dumps/original/",lune=True)
                 if not result and not filename:
@@ -2388,10 +2410,10 @@ class MyClient(discord.Client):
 if __name__ == "__main__":
     client = MyClient(intents=intents)
 
-    # Slash commands for configuration (owner only)
-    @client.tree.command(name="rolconfigure", description="Configure the role that can use real/restricted commands (.l, .dump, .msdeobf etc). Only server owner.")
-    @app_commands.describe(role="The Discord role to assign real command permissions to")
-    async def rolconfigure_slash(interaction: discord.Interaction, role: discord.Role):
+    # Slash commands for configuration (guild owner only, per-server)
+    @client.tree.command(name="configrol", description="Configure the role that can use real/restricted commands (.l, .dump, .msdeobf etc) in THIS server. Only server owner.")
+    @app_commands.describe(role="The Discord role to assign real command permissions to (users with this role can use .l etc)")
+    async def configrol_slash(interaction: discord.Interaction, role: discord.Role):
         try:
             if interaction.guild is None:
                 await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
@@ -2399,20 +2421,23 @@ if __name__ == "__main__":
             if interaction.user.id != interaction.guild.owner_id:
                 await interaction.response.send_message("Only the server owner can use this command.", ephemeral=True)
                 return
-            save_real_role(role.id)
+            save_real_role(interaction.guild.id, role.id)
             await interaction.response.send_message(
-                f"✅ Successfully set real commands role to {role.mention} (ID: {role.id}).\nUsers with this role can now access restricted commands like `.l`, `.dump`, `.msdeobf`, etc.",
+                f"✅ Successfully set real commands role to {role.mention} (ID: {role.id}) for **this server**.\nUsers with this role can now access restricted commands like `.l`, `.dump`, `.msdeobf`, etc in configured channels.\nUse `/setchannel` to allow a specific channel for these commands.",
                 ephemeral=True
             )
         except Exception as e:
-            print(f"rolconfigure error: {e}")
+            print(f"configrol error: {e}")
             try:
-                await interaction.response.send_message(f"Failed to configure role: {str(e)}", ephemeral=True)
+                if not interaction.response.is_done():
+                    await interaction.response.send_message(f"Failed to configure role: {str(e)}", ephemeral=True)
+                else:
+                    await interaction.followup.send(f"Failed to configure role: {str(e)}", ephemeral=True)
             except:
                 pass
 
-    @client.tree.command(name="setchannel", description="Set the channel where .l and real commands can be used more freely (owner only).")
-    @app_commands.describe(channel="The text channel to allow for .l / dumper commands")
+    @client.tree.command(name="setchannel", description="Set the channel where .l and real commands can be used freely in THIS server (guild owner only). After setting, the bot will allow .l etc here for users with the configured role.")
+    @app_commands.describe(channel="The text channel to allow for .l / dumper commands in this server")
     async def setchannel_slash(interaction: discord.Interaction, channel: discord.TextChannel):
         try:
             if interaction.guild is None:
@@ -2421,15 +2446,18 @@ if __name__ == "__main__":
             if interaction.user.id != interaction.guild.owner_id:
                 await interaction.response.send_message("Only the server owner can use this command.", ephemeral=True)
                 return
-            save_allowed_l_channel(channel.id)
+            save_allowed_l_channel(interaction.guild.id, channel.id)
             await interaction.response.send_message(
-                f"✅ Allowed L/real commands channel set to {channel.mention}.\nThe bot will now recognize this channel for .l and related commands.",
+                f"✅ Allowed L/real commands channel set to {channel.mention} for **this server**.\nNow users with the configured role (set via /configrol) can use `.l`, `.dump` and other real commands in {channel.mention}.\nThe bot is ready to respond to commands here. If you see errors, they will be reported in English with details.",
                 ephemeral=True
             )
         except Exception as e:
             print(f"setchannel error: {e}")
             try:
-                await interaction.response.send_message(f"Failed to set channel: {str(e)}", ephemeral=True)
+                if not interaction.response.is_done():
+                    await interaction.response.send_message(f"Failed to set channel: {str(e)}", ephemeral=True)
+                else:
+                    await interaction.followup.send(f"Failed to set channel: {str(e)}", ephemeral=True)
             except:
                 pass
 
