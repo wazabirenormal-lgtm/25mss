@@ -1927,18 +1927,34 @@ class MyClient(discord.Client):
         print("Logged in!")
         print(f"Connected to {len(self.guilds)} servers")
         # Sync slash commands to every guild the bot is in (makes them appear instantly)
+        sync_results = []
         for guild in self.guilds:
             try:
                 await self.tree.sync(guild=guild)
-                print(f"✅ Slash commands synced to guild: {guild.name} ({guild.id})")
+                msg = f"✅ Slash commands synced to guild: {guild.name} ({guild.id})"
+                print(msg)
+                sync_results.append(msg)
             except Exception as e:
-                print(f"⚠️ Failed to sync commands to {guild.id}: {e}")
+                msg = f"⚠️ Failed to sync commands to {guild.id}: {e}"
+                print(msg)
+                sync_results.append(msg)
         # Also try global sync as fallback (can take up to 1 hour to propagate everywhere)
         try:
             await self.tree.sync()
-            print("✅ Global slash command sync completed (may take time to appear in all servers)")
+            msg = "✅ Global slash command sync completed (may take time to appear in all servers)"
+            print(msg)
+            sync_results.append(msg)
         except Exception as e:
-            print(f"⚠️ Global sync note: {e}")
+            msg = f"⚠️ Global sync note: {e}"
+            print(msg)
+            sync_results.append(msg)
+        
+        # Print a clear summary for Railway logs
+        print("\n===== SLASH COMMAND SYNC SUMMARY =====")
+        for r in sync_results:
+            print(r)
+        print("======================================\n")
+        
         try:
             guild = self.get_guild(1466178537005256819)
             if guild:
