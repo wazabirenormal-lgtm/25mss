@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 import time # yeah 
 import requests
-# from onlyfans import onlyfans,fansly,discord_reply
+from onlyfans import onlyfans,fansly,discord_reply
 import threading
 from shutil import move as file_move
 import tempfile
@@ -2276,20 +2276,8 @@ class MyClient(discord.Client):
         #         await msg.reply(f"`Only works on this weird string encryption idk vro`")
         #         print("Deobf error:\n"+result.stderr)
         #     return
-        if smsg[0] == ".onlyfans":
-            if not msg.author.id in [ownerid,713113056346898522]:
-                await softerror(msg,"gooner xd")
-                return
-            await msg.reply(f"Fetching onlyfans of `{smsg[1]}`, this might take a while.")
-            _thread = threading.Thread(target=asyncio.run, args=(onlyfans(smsg[1], len(smsg)>2 and int(smsg[2]),Token,msg.guild.id,msg.channel.id,msg.id),))
-            _thread.start()
-        if smsg[0] == ".fansly":
-            if not msg.author.id in [ownerid,713113056346898522]:
-                await softerror(msg,"gooner xd")
-                return
-            await msg.reply(f"Fetching fansly of `{smsg[1]}`, this might take a while.")
-            _thread = threading.Thread(target=asyncio.run, args=(fansly(smsg[1], len(smsg)>2 and int(smsg[2]),Token,msg.guild.id,msg.channel.id,msg.id),))
-            _thread.start()
+        if smsg[0] == ".onlyfans" or smsg[0] == ".fansly":
+            await msg.reply("Este comando está desactivado temporalmente.")
         if msg.content.startswith(".ib2") or msg.content.startswith(".ibs"):
                 result, filename = await luafilehandler(msg,"","./unobfuscated/",ib2=True)
                 if not result and not filename:
@@ -2468,6 +2456,27 @@ class MyClient(discord.Client):
                 if isinstance(activity, CustomActivity):
                     before_status = activity
             for _ in range(3):
+                if any(role.id == 1385300853526892584 for role in get_roles(after.id)) and (not before_status or ".gg/25ms" in before_status.name[:12]):
+                    role=client.get_guild(1306714913539887237).get_role(1385300853526892584)
+                    try:
+                        await after.remove_roles(role)
+                        break
+                    except:
+                        await asyncio.sleep(.3)
+                else:break
+
+
+if __name__ == "__main__":
+    client = MyClient(intents=intents)
+
+    DISCORD_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
+
+    if not DISCORD_TOKEN:
+        print("❌ No se encontró DISCORD_TOKEN en las variables de entorno")
+        exit(1)
+
+    client.run(DISCORD_TOKEN)
+     for _ in range(3):
                 if any(role.id == 1385300853526892584 for role in get_roles(after.id)) and (not before_status or ".gg/25ms" in before_status.name[:12]):
                     role=client.get_guild(1306714913539887237).get_role(1385300853526892584)
                     try:
