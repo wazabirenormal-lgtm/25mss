@@ -30,8 +30,6 @@ import ssl, certifi
 import urllib.parse
 from obf_detect import detect_obf
 
-
-
 is_localhost=False
 
 ssl_context = ssl.create_default_context(cafile=certifi.where())
@@ -782,7 +780,11 @@ async def cmds_access_cmd(msg):
     else:
         await softerror(msg,"You need to be using the 25ms tag!")
 
-mv_data=loads(open("mvdata.json").read())
+mv_data = {}
+try:
+    mv_data = loads(open("mvdata.json").read())
+except FileNotFoundError:
+    print("⚠️ mvdata.json no encontrado, iniciando vacío.")
 mv_save_in_use=False
 
 async def save_mv_data():
@@ -1450,21 +1452,36 @@ async def softerror(msg,reply,waitdelete=6):
 
 
 message_counts = defaultdict(int)
-loadedc=loads(open("message_counts.json").read())
-for i in loadedc:
-    message_counts[int(i)]=loadedc[i]
+try:
+    loadedc = loads(open("message_counts.json").read())
+    for i in loadedc:
+        message_counts[int(i)] = loadedc[i]
+except FileNotFoundError:
+    print("⚠️ message_counts.json no encontrado, iniciando vacío.")
+
 old_message_counts = defaultdict(int)
-oldld = loads(open("old_message_counts.json").read())
-for i in oldld:
-    old_message_counts[int(i)]=oldld[i]
-dump_user_settings=defaultdict(int)
-loaded_sets = loads(open("dump_user_settings.json").read())
-for i in loaded_sets:
-    dump_user_settings[int(i)]=loaded_sets[i]
+try:
+    oldld = loads(open("old_message_counts.json").read())
+    for i in oldld:
+        old_message_counts[int(i)] = oldld[i]
+except FileNotFoundError:
+    print("⚠️ old_message_counts.json no encontrado, iniciando vacío.")
+
+dump_user_settings = defaultdict(int)
+try:
+    loaded_sets = loads(open("dump_user_settings.json").read())
+    for i in loaded_sets:
+        dump_user_settings[int(i)] = loaded_sets[i]
+except FileNotFoundError:
+    print("⚠️ dump_user_settings.json no encontrado, iniciando vacío.")
+
 oracle_keys = defaultdict(int)
-loaded_oracle_keys = loads(open("oracle_keys.json").read())
-for i in loaded_oracle_keys:
-    oracle_keys[int(i)]=loaded_oracle_keys[i]
+try:
+    loaded_oracle_keys = loads(open("oracle_keys.json").read())
+    for i in loaded_oracle_keys:
+        oracle_keys[int(i)] = loaded_oracle_keys[i]
+except FileNotFoundError:
+    print("⚠️ oracle_keys.json no encontrado, iniciando vacío.")
 
 class dumpConfig(View):
     def __init__(self, user):
