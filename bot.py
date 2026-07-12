@@ -28,7 +28,7 @@ from hashlib import sha256
 import aiohttp
 import ssl, certifi
 import urllib.parse
-from obf_detect import detect_obf
+from obf_detect import obf_detect
 
 is_localhost=False
 
