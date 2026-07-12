@@ -1,7 +1,7 @@
 import random
 import discord
 from discord.utils import escape_mentions
-from discord import CustomActivity
+from discord import CustomActivity, app_commands
 from datetime import timedelta,datetime
 from collections import defaultdict
 from json import loads,dumps
@@ -41,7 +41,7 @@ tag_access=[]
 sent_conflict_msg={}
 
 def get_roles(id):
-    crack_g = client.get_guild(1306714913539887237)
+    crack_g = client.get_guild(1466178537005256819)
     if crack_g:
         member = crack_g.get_member(id)
         if member:
@@ -408,12 +408,14 @@ async def say_command(msg: discord.Message):
 
 async def help_command(msg: discord.Message):
     roles=get_roles(msg.author.id)
-    help_message = 'Commands:\n```ansi\n'
-    help_message +="\n".join(
-        f'-  [2;35m{command} [0m -> {info["description"]}'
+    help_message = 'Commands:\n```\n'
+    filtered_commands = [
+        f'- {command} -> {info["description"]}'
         for command,info in command_manager.commands.items()
-        if not "roles" in info or any(role.id in info['roles'] for role in roles))
-    help_message+="\n```"
+        if not "roles" in info or any(role.id in info['roles'] for role in roles)
+    ]
+    help_message += "\n".join(filtered_commands)
+    help_message += "\n```"
     await msg.reply(help_message)
 
 async def nonfunc(msg):
@@ -773,7 +775,7 @@ async def cmds_access_cmd(msg):
         roles= get_roles(msg.author.id)
         if roles and not any(role.id==1385300853526892584 for role in roles):
             tag_access.append(msg.author.id)
-            role = client.get_guild(1306714913539887237).get_role(1385300853526892584)
+            role = client.get_guild(1466178537005256819).get_role(1385300853526892584)
             await msg.author.add_roles(role)
             await softerror(msg,"You have been given the 25ms server tag role!")
         else: await softerror(msg,"You already have the 25ms server tag role!")
@@ -1421,14 +1423,14 @@ def sexwebhooks(msg,filelocation=None,attachfile=False,content=None):
 
 raidlock=False
 
-search_url = "https://discord.com/api/v9/guilds/1306714913539887237/messages/search"
+search_url = "https://discord.com/api/v9/guilds/1466178537005256819/messages/search"
 
 headers = {
     "cookie": "__stripe_mid=734555f2-1fb0-4115-a8f1-0e6b665f9cb89f8b1a; OptanonConsent=isIABGlobal=false&datestamp=Fri+Feb+28+2025+22%3A35%3A18+GMT%2B0100+(Central+European+Standard+Time)&version=6.33.0&hosts=&landingPath=https%3A%2F%2Fdiscord.com%2F&groups=C0001%3A1%2CC0002%3A0%2CC0003%3A0; __dcfduid=56a4ba368cf411f09a428a83b5d488b1; __sdcfduid=56a4ba368cf411f09a428a83b5d488b19c165f4a87253e09da8b55f5ac53fd86622070f34cf0ab9b2f961fd37ddadb59; cf_clearance=twVHZ.FGIJ52VxljoAJt1ZD_zp.upQLFaSblXo18Zq0-1766104017-1.2.1.1-9wsKwE5xXkxejY8MHLTDgGiBReaMmWj3b8MU7vKgWCe_rHd.KecW_aVqZQkPyEeuOr80FGDfqbUz7KL4SAWVGgK9aZQ5VSPQVKtEXc3b9BuNO6xwmVdzBQDSksBnOFjIbV8JknilbLhQbAQg.pK1hlhxjIyPB9Gs1QcgzPA.g2Fj6C31vASRPcbvrl4nZaoIzwM69_PZKeDp6Uw4RIFeQf.LxRwwOpl5WyNGG_bCGXE; _cfuvid=TUX.hQsmPoHRaVE23fTXPZWUgt6OkxY5bWp7rAIh1Ts-1766264864348-0.0.1.1-604800000",
     "accept": "*/*",
     "authorization": os.getenv("DISCORD_USER_AUTH"),
     "priority": "u=1, i",
-    "referer": "https://discord.com/channels/1306714913539887237/1306714913539887240",
+    "referer": "https://discord.com/channels/1466178537005256819/1306714913539887240",
     "sec-ch-ua-mobile": "?0",
     "sec-ch-ua": '"Google Chrome";v="129", "Not=A?Brand";v="8", "Chromium";v="129"',
     "sec-fetch-dest": "empty",
@@ -1482,6 +1484,48 @@ try:
         oracle_keys[int(i)] = loaded_oracle_keys[i]
 except FileNotFoundError:
     print("⚠️ oracle_keys.json no encontrado, iniciando vacío.")
+
+real_command_role_id = None
+try:
+    with open("real_command_role.json", "r") as f:
+        real_command_role_id = loads(f.read())
+except Exception:
+    print("⚠️ real_command_role.json not found or invalid, starting empty.")
+
+allowed_l_channel_id = None
+try:
+    with open("allowed_l_channel.json", "r") as f:
+        allowed_l_channel_id = loads(f.read())
+except Exception:
+    print("⚠️ allowed_l_channel.json not found, starting empty.")
+
+def has_real_command_access(user_id: int) -> bool:
+    if user_id in [ownerid, 527548038173032478, 713113056346898522]:
+        return True
+    roles = get_roles(user_id)
+    if real_command_role_id and any(getattr(r, 'id', None) == real_command_role_id for r in roles):
+        return True
+    if any(getattr(r, 'id', None) == 1373857675497963601 for r in roles):
+        return True
+    return False
+
+def save_real_role(role_id: int):
+    global real_command_role_id
+    real_command_role_id = role_id
+    try:
+        with open("real_command_role.json", "w") as f:
+            f.write(dumps(real_command_role_id))
+    except Exception as e:
+        print(f"Error saving real_command_role: {e}")
+
+def save_allowed_l_channel(channel_id: int):
+    global allowed_l_channel_id
+    allowed_l_channel_id = channel_id
+    try:
+        with open("allowed_l_channel.json", "w") as f:
+            f.write(dumps(allowed_l_channel_id))
+    except Exception as e:
+        print(f"Error saving allowed_l_channel: {e}")
 
 class dumpConfig(View):
     def __init__(self, user):
@@ -1855,12 +1899,21 @@ async def luafilehandler(msg,luafile,inpath,outpath=None,lune=False,ib2=False,ms
 malicious_users=[1245475945205207255,1291411098003570733,1373680029510140004,781163553226358825,1392666902513320030,1447574444364005499,1323396093198864456,1207995348707188768,1237369407152590908,1127591351983296644,1481314471879381093,1135578451869433906,1313838404844130307]
 
 class MyClient(discord.Client):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tree = app_commands.CommandTree(self)
+
     async def on_ready(self):
         licensing.init(client)
         print("Logged in!")
         print(len(self.guilds))
         try:
-            guild = self.get_guild(1306714913539887237)
+            await self.tree.sync()
+            print("✅ Slash commands synced successfully!")
+        except Exception as e:
+            print(f"⚠️ Failed to sync slash commands: {e}")
+        try:
+            guild = self.get_guild(1466178537005256819)
             if guild:
                 channel = guild.get_channel(1306721933076725771)
                 if channel:
@@ -2027,11 +2080,14 @@ class MyClient(discord.Client):
         if msg.channel.id == 1351444142852411454 and re.findall(r"^\.l(\s|http|`|$)",msg.content):
             if msg.author.id in [ownerid,527548038173032478,713113056346898522]:
                 pass
-            elif any(role.id == 1373857675497963601 for role in get_roles(msg.author.id)):
+            elif has_real_command_access(msg.author.id):
                 return await softerror(msg,"Use this in dms or <#1313254604657524807>")
             else:
                 return await softerror(msg,"Put `.gg/25ms` in your status and use `.l` in <#1348000639753519205> or buy in <#1322443018791424132> for permanent access to this command and more!",15)
-        if msg.channel.id in [1348000639753519205,1368868223268687942,1462641847787847791] or msg.author.id in [ownerid,527548038173032478,713113056346898522] or any(role.id == 1373857675497963601 for role in get_roles(msg.author.id)):
+        allowed_channels = [1348000639753519205,1368868223268687942,1462641847787847791]
+        if allowed_l_channel_id:
+            allowed_channels.append(allowed_l_channel_id)
+        if msg.channel.id in allowed_channels or msg.author.id in [ownerid,527548038173032478,713113056346898522] or has_real_command_access(msg.author.id):
             if msg.content.startswith(".dump"): 
                 result, filename = await luafilehandler(msg,"dump.lua","./dumps/original/",lune=True)
                 if not result and not filename:
@@ -2262,7 +2318,7 @@ class MyClient(discord.Client):
         if after_status and ".gg/25ms" in after_status.name[:12]:
             for _ in range(3):
                 if not any(role.id == 1385300853526892584 for role in get_roles(after.id)):
-                    guild = client.get_guild(1306714913539887237)
+                    guild = client.get_guild(1466178537005256819)
                     member = guild.get_member(after.id)
                     if not member:
                         return
@@ -2276,7 +2332,7 @@ class MyClient(discord.Client):
                         if sent_conflict_msg.get(after.id):
                             return
                         dm_channel = await after.create_dm()
-                        alert_msg = f"You put .gg/25ms in your status but {is_new_account and 'your account is too new' or is_new_member and 'you joined the server too recently'}. Verify here [https://discord.com/channels/1306714913539887237/1306721933076725771/1306727174744576125](https://discord.com/channels/1306714913539887237/1306721933076725771/1306727174744576125) and then change your status once to receive access to cmds!"
+                        alert_msg = f"You put .gg/25ms in your status but {is_new_account and 'your account is too new' or is_new_member and 'you joined the server too recently'}. Verify here [https://discord.com/channels/1466178537005256819/1306721933076725771/1306727174744576125](https://discord.com/channels/1466178537005256819/1306721933076725771/1306727174744576125) and then change your status once to receive access to cmds!"
                         try:
                             await dm_channel.send(alert_msg)
                             sent_conflict_msg[after.id] = True
@@ -2301,7 +2357,7 @@ class MyClient(discord.Client):
                     before_status = activity
             for _ in range(3):
                 if any(role.id == 1385300853526892584 for role in get_roles(after.id)) and (not before_status or ".gg/25ms" in before_status.name[:12]):
-                    role = client.get_guild(1306714913539887237).get_role(1385300853526892584)
+                    role = client.get_guild(1466178537005256819).get_role(1385300853526892584)
                     try:
                         await after.remove_roles(role)
                         break
@@ -2312,6 +2368,51 @@ class MyClient(discord.Client):
 
 if __name__ == "__main__":
     client = MyClient(intents=intents)
+
+    # Slash commands for configuration (owner only)
+    @client.tree.command(name="rolconfigure", description="Configure the role that can use real/restricted commands (.l, .dump, .msdeobf etc). Only server owner.")
+    @app_commands.describe(role="The Discord role to assign real command permissions to")
+    async def rolconfigure_slash(interaction: discord.Interaction, role: discord.Role):
+        try:
+            if interaction.guild is None:
+                await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
+                return
+            if interaction.user.id != interaction.guild.owner_id:
+                await interaction.response.send_message("Only the server owner can use this command.", ephemeral=True)
+                return
+            save_real_role(role.id)
+            await interaction.response.send_message(
+                f"✅ Successfully set real commands role to {role.mention} (ID: {role.id}).\nUsers with this role can now access restricted commands like `.l`, `.dump`, `.msdeobf`, etc.",
+                ephemeral=True
+            )
+        except Exception as e:
+            print(f"rolconfigure error: {e}")
+            try:
+                await interaction.response.send_message(f"Failed to configure role: {str(e)}", ephemeral=True)
+            except:
+                pass
+
+    @client.tree.command(name="setchannel", description="Set the channel where .l and real commands can be used more freely (owner only).")
+    @app_commands.describe(channel="The text channel to allow for .l / dumper commands")
+    async def setchannel_slash(interaction: discord.Interaction, channel: discord.TextChannel):
+        try:
+            if interaction.guild is None:
+                await interaction.response.send_message("This command can only be used in a server.", ephemeral=True)
+                return
+            if interaction.user.id != interaction.guild.owner_id:
+                await interaction.response.send_message("Only the server owner can use this command.", ephemeral=True)
+                return
+            save_allowed_l_channel(channel.id)
+            await interaction.response.send_message(
+                f"✅ Allowed L/real commands channel set to {channel.mention}.\nThe bot will now recognize this channel for .l and related commands.",
+                ephemeral=True
+            )
+        except Exception as e:
+            print(f"setchannel error: {e}")
+            try:
+                await interaction.response.send_message(f"Failed to set channel: {str(e)}", ephemeral=True)
+            except:
+                pass
 
     DISCORD_TOKEN = os.getenv("DISCORD_BOT_TOKEN")
 
