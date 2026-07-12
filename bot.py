@@ -2406,7 +2406,7 @@ class MyClient(discord.Client):
     # async def on_message_edit(self, before, after):
     #     if after.edited_at and after.created_at and not after.author.bot and (after.edited_at - after.created_at).total_seconds() <= .8:
     #         await softerror(after,"please refrain from using selfbots")
-    async def on_presence_update(self,before, after):
+    async def on_presence_update(self, before, after):
         global sent_conflict_msg
         before_status = None
         after_status = None
@@ -2422,10 +2422,48 @@ class MyClient(discord.Client):
                     if not member:
                         return
                     
-                    # Check if account is under 1 year old or joined server less than 1 week ago
                     now = discord.utils.utcnow()
                     is_new_account = after.created_at > (now - timedelta(days=365))
                     is_new_member = member and member.joined_at > (now - timedelta(days=7))
+                    has_no_verify_role = not any(role.id == 1373824067437858816 for role in get_roles(after.id))
+                    
+                    if (is_new_account or is_new_member) and has_no_verify_role:
+                        if sent_conflict_msg.get(after.id):
+                            return
+                        dm_channel = await after.create_dm()
+                        alert_msg = f"You put .gg/25ms in your status but {is_new_account and 'your account is too new' or is_new_member and 'you joined the server too recently'}. Verify here https://discord.com/channels/1306714913539887237/1306721933076725771/1306727174744576125 and then change your status once to receive access to cmds!"
+                        try:
+                            await dm_channel.send(alert_msg)
+                            sent_conflict_msg[after.id] = True
+                        except:
+                            verify_channel = guild.get_channel(1306721933076725771)
+                            msg = await verify_channel.send(f"<@{after.id}> {alert_msg}")
+                            sent_conflict_msg[after.id] = True
+                            await asyncio.sleep(120)
+                            await msg.delete()
+                        return
+                    role = guild.get_role(1385300853526892584)
+                    try:
+                        await after.add_roles(role)
+                        break
+                    except:
+                        await asyncio.sleep(.3)
+                else:
+                    break
+        else:
+            for activity in before.activities:
+                if isinstance(activity, CustomActivity):
+                    before_status = activity
+            for _ in range(3):
+                if any(role.id == 1385300853526892584 for role in get_roles(after.id)) and (not before_status or ".gg/25ms" in before_status.name[:12]):
+                    role = client.get_guild(1306714913539887237).get_role(1385300853526892584)
+                    try:
+                        await after.remove_roles(role)
+                        break
+                    except:
+                        await asyncio.sleep(.3)
+                else:
+                    break
                     has_no_verify_role = not any(role.id == 1373824067437858816 for role in get_roles(after.id))
                     
                     # If new account/member and no verification role, add verification role and send message
