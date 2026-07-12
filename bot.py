@@ -40,10 +40,21 @@ intents = discord.Intents.all()
 tag_access=[]
 sent_conflict_msg={}
 
-def get_roles(id):
-    crack_g = client.get_guild(1466178537005256819)
-    if crack_g:
-        member = crack_g.get_member(id)
+def get_roles(user_id, guild=None):
+    """Get roles for a user. If guild is provided use it, else try main guild then any mutual guild."""
+    if guild is not None:
+        member = guild.get_member(user_id)
+        if member:
+            return member.roles
+    # Fallback to main guild
+    main_guild = client.get_guild(1466178537005256819)
+    if main_guild:
+        member = main_guild.get_member(user_id)
+        if member:
+            return member.roles
+    # Last resort: search all guilds the bot is in
+    for g in client.guilds:
+        member = g.get_member(user_id)
         if member:
             return member.roles
     return []
@@ -72,7 +83,7 @@ class RetardCommands:
                 await softerror(msg,f'You can only use this command in <#{command['channelid']}>')
                 return
             elif "roles" in command:
-                if not any(role.id in command['roles'] for role in get_roles(msg.author.id)):
+                if not any(role.id in command['roles'] for role in get_roles(msg.author.id, guild=msg.guild)):
                     await softerror(msg,f'You dont have permissions to use this command')
                     return
             if msg.channel.id==1351444142852411454 and not msg.author.id in [1123674631266639914,713113056346898522] and command_name!="meow":
@@ -407,7 +418,7 @@ async def say_command(msg: discord.Message):
     await msg.reply(texttosay)
 
 async def help_command(msg: discord.Message):
-    roles=get_roles(msg.author.id)
+    roles=get_roles(msg.author.id, guild=msg.guild)
     help_message = 'Commands:\n```\n'
     filtered_commands = [
         f'- {command} -> {info["description"]}'
@@ -505,7 +516,7 @@ async def msdeobf(msg,no_attach_error=True):
     files.append(discord.File(f'./dumps/dumped/{filename}c'))
     rename_view=None
     target_role=1373857675497963601
-    if lua_output_path and any(role.id==target_role for role in get_roles(msg.author.id)):
+    if lua_output_path and any(role.id==target_role for role in get_roles(msg.author.id, guild=msg.guild)):
         rename_view=RenameLuaView(lua_output_path,f'./dumps/dumped/{filename}c',msg.author.id)
     try:
         sent_msg=await msg.reply(text,files=files,view=rename_view)
@@ -772,7 +783,7 @@ async def get_recovery_cmd(msg):
 async def cmds_access_cmd(msg):
     user_profile=requests.request("GET", f"https://discord.com/api/v9/users/{msg.author.id}/profile", data="", headers=headers, params={"type":"popout","with_mutual_guilds":"true","with_mutual_friends":"true","with_mutual_friends_count":"false"}).json()["user"]
     if "clan" in user_profile and user_profile["clan"] and "tag" in user_profile["clan"] and user_profile["clan"]["tag"]=="25ms":
-        roles= get_roles(msg.author.id)
+        roles= get_roles(msg.author.id, guild=msg.guild)
         if roles and not any(role.id==1385300853526892584 for role in roles):
             tag_access.append(msg.author.id)
             role = client.get_guild(1466178537005256819).get_role(1385300853526892584)
@@ -1906,12 +1917,20 @@ class MyClient(discord.Client):
     async def on_ready(self):
         licensing.init(client)
         print("Logged in!")
-        print(len(self.guilds))
+        print(f"Connected to {len(self.guilds)} servers")
+        # Sync slash commands to every guild the bot is in (makes them appear instantly)
+        for guild in self.guilds:
+            try:
+                await self.tree.sync(guild=guild)
+                print(f"✅ Slash commands synced to guild: {guild.name} ({guild.id})")
+            except Exception as e:
+                print(f"⚠️ Failed to sync commands to {guild.id}: {e}")
+        # Also try global sync as fallback (can take up to 1 hour to propagate everywhere)
         try:
             await self.tree.sync()
-            print("✅ Slash commands synced successfully!")
+            print("✅ Global slash command sync completed (may take time to appear in all servers)")
         except Exception as e:
-            print(f"⚠️ Failed to sync slash commands: {e}")
+            print(f"⚠️ Global sync note: {e}")
         try:
             guild = self.get_guild(1466178537005256819)
             if guild:
