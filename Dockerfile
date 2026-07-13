@@ -1,26 +1,30 @@
 FROM python:3.13-slim
 
-# Instalar herramientas necesarias en Linux
-RUN apt-get update && apt-get install -y curl unzip && rm -rf /var/lib/apt/lists/*
+# Instalar herramientas del sistema y Node.js (necesario para luamin/beautify.js)
+RUN apt-get update && apt-get install -y curl unzip nodejs && rm -rf /var/lib/apt/lists/*
 
-# Descargar e instalar Lune para Linux (Versión x86_64 de 64 bits)
-# Nota: Puedes cambiar v0.8.8 por la versión exacta de Lune que necesites
+# 1. Descargar e instalar LUNE para Linux
 RUN curl -L -o lune.zip https://github.com/lune-org/lune/releases/download/v0.8.8/lune-0.8.8-linux-x86_64.zip \
     && unzip lune.zip \
     && mv lune /usr/local/bin/lune \
     && chmod +x /usr/local/bin/lune \
     && rm lune.zip
 
-# Configurar el directorio de trabajo del bot
+# 2. Descargar e instalar DARKLUA para Linux
+RUN curl -L -o darklua.zip https://github.com/seaofvoices/darklua/releases/download/v0.13.1/darklua-linux-x86_64.zip \
+    && unzip darklua.zip \
+    && mv darklua /usr/local/bin/darklua \
+    && chmod +x /usr/local/bin/darklua \
+    && rm darklua.zip
+
+# Configurar directorio de trabajo
 WORKDIR /app
 
-# Copiar los requisitos e instalarlos
+# Copiar e instalar dependencias de Python
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copiar todo el código del bot al contenedor
+# Copiar todo el código del bot
 COPY . .
 
-# Comando para iniciar tu bot
 CMD ["python", "bot.py"]
-
