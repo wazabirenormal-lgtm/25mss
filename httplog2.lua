@@ -3,9 +3,9 @@ local _require = require
 local settings = {
     varnames = true,
     usesimplefunctions = false,
-    watchoutforloop = true, -- Re-activado de forma segura
+    watchoutforloop = true, 
     spynilglobals = true,
-    hook_op = true,
+    hook_op = false, -- DESACTIVADO POR DEFECTO: Evita llamadas externas que congelan el contenedor
     hook_op_default_return = "original",
     log_lines = false,
     better_funcs = true,
@@ -441,7 +441,8 @@ tostring_complex = function(var, ignoremt, antioverflow)
                 metatables[var].mt[i] = nil
             end
         end
-        insert(currentR, "local " .. varname .. " = " .. (metatables[var].mt and "setmetatable(" or "") .. tostring_complex(var, true) .. (metatables[var].mt and "," .. tostring_complex(clonemt) .. ")" or ""))
+        -- CORRECCIÓN CRÍTICA: Se pasa el parámetro antioverflow para evitar bucles infinitos en metatablas cíclicas
+        insert(currentR, "local " .. varname .. " = " .. (metatables[var].mt and "setmetatable(" or "") .. tostring_complex(var, true, antioverflow) .. (metatables[var].mt and "," .. tostring_complex(clonemt, false, antioverflow) .. ")" or ""))
         if clonemt then
             for i, v in clonemt do
                 metatables[var].mt[i] = v
@@ -484,7 +485,7 @@ tostring_complex = function(var, ignoremt, antioverflow)
             insert(unfinishedfuncs, {func = var, args = args, varargvars = varargvars})
         end
         local res = "function(" .. argstr .. (varargstr and ((argstr ~= "" and "," or "") .. "...") or "") .. ")\n"
-            .. (varargstr and "local " .. varargstr .. " = ...\n" or "")
+            .. (varargstr abatement and "local " .. varargstr .. " = ...\n" or "")
             .. (returnR and table.concat(returnR, "\n") or "-- func" .. #unfinishedfuncs)
             .. "\nend"
         for _ = before_unclosed, unclosed_blocks - 1 do
@@ -537,7 +538,7 @@ simplelog = function(varname, source, ...)
         local h = getheight()
         if not h or h <= 0 then h = 10 end
         local min = 1e5 / (1 + (h / 5))
-        if min < 2000 then min = 5000 end -- Límite mínimo de seguridad para Lune
+        if min < 2000 then min = 5000 end 
         
         lastfound = lastfound + plus
         if lastfound > min and varname ~= "er" then
@@ -546,13 +547,10 @@ simplelog = function(varname, source, ...)
             end
             lastfound = lastfound > minusonerror and lastfound - minusonerror or 0
             
-            -- REPORTE DETALLADO 1: Bucle de logging repetitivo
             error("\n=======================================================\n" ..
                   "[ALERTA: BUCLE INFINITO EN SIMPLELOG DETECTADO]\n" ..
                   "-> Operación repetida en bucle: " .. tostring(smegstring) .. "\n" ..
                   "-> Origen/Función causante: " .. tostring(source) .. "\n" ..
-                  "-> Variable afectada: " .. tostring(varname) .. "\n" ..
-                  "-> ¿Por qué falló?: El script de WeAreDevs está llamando consecutivamente a la misma instrucción sin avanzar en la estructura. Esto se debe a una protección anti-dump o un control anti-deobfuscator activo.\n" ..
                   "=======================================================")
         end
     else
@@ -569,7 +567,9 @@ simplelog = function(varname, source, ...)
         end
         if type(linenumber) == "string" then write_string = write_string .. "-- line " .. linenumber end
     end
-    print(write_string)
+    
+    -- MODIFICACIÓN IMPORTANTE: Se eliminó el print masivo para evitar que el hosting/bot mate el proceso por log-flood.
+    -- El código completo generado se sigue guardando perfectamente en el archivo final.
     multiinsert(currentR, write_string:split("\n"))
 end
 local function simplemath(operator)
@@ -1186,13 +1186,9 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
                     if fuck > fenv_error_on * 2 then
                         plserror = true
                     elseif fuck > fenv_error_on then
-                        
-                        -- REPORTE DETALLADO 2: Bucle cerrado en Entorno Virtual (Fenv)
                         error("\n=======================================================\n" ..
                               "[ALERTA: BUCLE INFINITO EN ENTORNO VIRTUAL DETECTADO]\n" ..
                               "-> Última variable global consultada: " .. tostring(key) .. "\n" ..
-                              "-> Contador de spam interno: " .. tostring(fuck) .. " lecturas seguidas\n" ..
-                              "-> ¿Por qué falló?: El script objetivo ejecutó un bucle cerrado consultando la global '" .. tostring(key) .. "' millones de veces sin generar nuevas líneas de código. Esto pasa si el script detecta que está en un Sandbox (anti-cheat/anti-tamper) o si falló una condición de salida de un bucle interno.\n" ..
                               "=======================================================")
                     end
                 else
@@ -1305,8 +1301,8 @@ if not settings.log_lines then
     local start = os.clock()
     r = evaluate_single_use_variables(r)
     evaluate_stuff(r)
-    print("evaluating in ", os.clock() - start, "seconds")
-    print("reduced from", total_before, "to", #r, "lines")
+    _print("evaluating in ", os.clock() - start, "seconds")
+    _print("reduced from", total_before, "to", #r, "lines")
 else
     local oldr = table.clone(r)
     table.clear(r)
@@ -1318,5 +1314,4 @@ else
 end
 fs.writeFile(outpath .. targetfilename:gsub(".lua", "") .. post, table.concat(r, "\n"))
 local endt = clock() - startt
-print("success in", endt, "seconds!\nWritten to " .. outpath .. targetfilename:gsub(".lua", "") .. post)
-print(table.concat(r, "\n"))
+_print("success in", endt, "seconds!\nWritten to " .. outpath .. targetfilename:gsub(".lua", "") .. post)
