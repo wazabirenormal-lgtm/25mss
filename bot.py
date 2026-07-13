@@ -2167,7 +2167,8 @@ class MyClient(discord.Client):
                         await msg.reply(f"{msg.author.mention}{webhooks and '\n'+webhooks or ''}",file=file)
                     except:
                         await msg.reply("Couldnt send file. ping 33ms to get it lol")
-                elif result and result.stdout!="" and (not result.stderr or "thread 'main' has overflowed" in result.stderr):
+                # MODIFICACIÓN: Filtrar estrictamente por errores reales de bucle infinito
+                elif result and ("infiniteloop" in result.stdout.lower() or "infiniteloop" in result.stderr.lower() or "thread 'main' has overflowed" in result.stderr):
                     stdout_bytes = result.stdout.encode()
                     max_size = 4 * 1024 * 1024 
                     if len(stdout_bytes) > max_size:
@@ -2177,9 +2178,20 @@ class MyClient(discord.Client):
                     buffer.seek(0)
                     await msg.reply("Infinite loop while logging.",file=discord.File(fp=buffer, filename="error_output.lua"))
                 else:
-                    error_message=result and result.stderr.split("\n")[0].replace('[string "sandbox"]:','line ')
-                    await msg.reply(f"Error while dumping. Most likely an invalid script.\n```diff\n- {error_message  or 'dihh error'}\n```")
+                    # Ahora sí procesará cualquier otro error (Sintaxis, falta de librerías, etc.)
+                    error_message = None
+                    if result and result.stderr:
+                        error_message = result.stderr.split("\n")[0].replace('[string "sandbox"]:','line ')
+                    elif result and "heh" in result.stdout:
+                        # Captura errores internos del sandbox que httplog2 atrapó con pcall y mandó al stdout
+                        for line in result.stdout.split("\n"):
+                            if line.startswith("heh"):
+                                error_message = line.replace("heh", "Internal Sandbox Error:")
+                                break
+                    
+                    await msg.reply(f"Error while dumping. Most likely an invalid script.\n```diff\n- {error_message or 'Unknown execution error'}\n```")
                     print("Dump error:\n",(result and result.stderr or "no stderr"))
+)
 
             if msg.content.startswith(".udump"): 
                 result, filename = await luafilehandler(msg,"unpack_dumper.lua","./dumps/original/",lune=True)
