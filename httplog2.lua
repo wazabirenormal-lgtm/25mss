@@ -177,7 +177,7 @@ local function evaluate_stuff(r)
                 res = front .. '"..' .. res
             end
             if back ~= '"' then
-                res = res .. '.."..back
+                res = res .. '.."' .. back
             end
             return res
         end)
