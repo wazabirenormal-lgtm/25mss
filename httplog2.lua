@@ -4,14 +4,14 @@
 local insert=table.insert
 local _require=require
 local settings={
-    varnames=true, -- _someName69
-    usesimplefunctions=false, -- functions wont be explored if true
-    watchoutforloop=true, -- infinitelooperror!
-    spynilglobals=true, -- when true will spy all globals, even if they might not be a defined in a normal env
-    hook_op=true, -- attempt to hook expressions like "==", "and", "or", "not" and more
-    hook_op_default_return="original", -- "original", "spy", false, true
+    varnames=true,
+    usesimplefunctions=false,
+    watchoutforloop=true,
+    spynilglobals=true,
+    hook_op=true,
+    hook_op_default_return="original",
     log_lines=false,
-    better_funcs=true, -- runs found functions after the main script finished!
+    better_funcs=true,
 }
 local unfinishedfuncs,is_unfinished={},false
 local thisfunction=debug.info(1,"f")
@@ -20,8 +20,8 @@ local msecNotReady=false
 local luraphnotready=0
 local cenv,genv,analyzefunction,metatables,cclosures,types = {},{},nil,{},{},{}
 local _tostring=tostring
-local concat_me=`<25ms_concat_me>`
-local concat_me_close=`</25ms_concat_me>`
+local concat_me="<25ms_concat_me>"
+local concat_me_close="</25ms_concat_me>"
 local oldtype=type
 local getmetatable=getmetatable
 local pack,unpack=table.pack,unpack
@@ -114,7 +114,6 @@ local function evaluate_single_use_variables(r)
                         continue
                     end
                     if v:find(varargstr,1,true) then
-                        local next=v:gmatch(varargstr..".") 
                         r[ii]=v:gsub(varargstr,"...")
                     end
                     local firstname=varargstr:split(",")[1]
@@ -299,7 +298,6 @@ elseif input:find("(does your environment support load/loadstring?)",1,true) the
             Zstd="Zstd"
         }
     }
-    local buffer=buffer
     local Services = {
         EncodingService={
             DecompressBuffer=function(_,tbl)
@@ -447,7 +445,7 @@ tostring_complex=function(var,ignoremt,antioverflow)
                 metatables[var].mt[i]=nil
             end
         end
-        insert(currentR,`local {varname} = {metatables[var].mt and "setmetatable(" or ""}{tostring_complex(var,true)}{metatables[var].mt and ","..tostring_complex(clonemt)..")" or ""}`)
+        insert(currentR,"local "..varname.." = "..(metatables[var].mt and "setmetatable(" or "")..tostring_complex(var,true)..(metatables[var].mt and ","..tostring_complex(clonemt)..")" or ""))
         if clonemt then
             for i,v in clonemt do
                 metatables[var].mt[i]=v
@@ -639,9 +637,9 @@ local spymt={
                 if funcused=="next" then
                     mid="next,"..mid
                 elseif funcused then
-                    mid=`{funcused}({mid})`
+                    mid=funcused.."("..mid..")"
                 end
-                insert(currentR,`for {varsstr} in {mid} do`)
+                insert(currentR,"for "..varsstr.." in "..mid.." do")
                 ran=true
                 return unpack(vars)
             end
@@ -744,7 +742,7 @@ analyzefunction = function(chunk,r,lowestlayer,...)
                 b=b()
                 if is_a_context or type(b)=="context_type" then
                     local varname=getnewvar()
-                    simplelog(varname,`({tostring_complex(a)} or {tostring_complex(b)})`,Enum_NOCALL)
+                    simplelog(varname,"("..tostring_complex(a).." or "..tostring_complex(b)..")",Enum_NOCALL)
                     return spytbl(varname)
                 end
                 return b
@@ -774,7 +772,7 @@ analyzefunction = function(chunk,r,lowestlayer,...)
                             mt=false,
                             used=false
                         }
-                        simplelog(varname,`{tostring_complex(tbl)}[{tostring_complex(key)}]`,Enum_NOCALL)
+                        simplelog(varname,tostring_complex(tbl).."["..tostring_complex(key).."]",Enum_NOCALL)
                         return spytbl(varname)
                     end
                     return tbl[key]
@@ -785,7 +783,7 @@ analyzefunction = function(chunk,r,lowestlayer,...)
                             mt=false,
                             used=false
                         }
-                        insert(currentR,`{tostring_complex(tbl)}[{tostring_complex(key)}] = {tostring_complex(value)}`)
+                        insert(currentR,tostring_complex(tbl).."["..tostring_complex(key).."] = "..tostring_complex(value))
                     end
                     tbl[key]=value
                 end,
@@ -1212,7 +1210,7 @@ analyzefunction = function(chunk,r,lowestlayer,...)
                     end
                     if k=="Descriptor" or type(k)=="string" and k:sub(1,10)=="FlatIdent_" then
                     else
-                        insert(currentR,`fenv[{tostring_complex(k)}] = {tostring_complex(v)}`)
+                        insert(currentR,"fenv["..tostring_complex(k).."] = "..tostring_complex(v))
                     end
                 end
                 tsenv[k]=v
@@ -1268,7 +1266,7 @@ for i=1,20 do
             local locallocation,localused=#newr,false
             local localname=newr[locallocation]:match("local ([%w_]+)")
             local obj=unfinishedfuncs[tonumber(num)]
-            local s,re=pcall(analyzefunction,obj.func,{},false,multiunpack(obj.args,obj.varargs))
+            local s,re=pcall(analyzefunction,obj.func,{},false,multiunpack(obj.args,obj.varargvars))
             for i,v in re do
                 if v\~=nil then
                     if v:find(localname,1,true) then
