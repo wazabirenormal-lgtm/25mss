@@ -1,4 +1,3 @@
--- httplog2.lua mejorado por 25ms
 local insert = table.insert
 local _require = require
 local settings = {
@@ -78,12 +77,12 @@ if is_bot then
     _print("-- wow this script had an infinite loop that wasnt resolved, this output was generated at runtime and is very bad.\n-- script id: " .. tostring(process.args[1]))
 end
 local print = function(...)
-    if is_bot and debug.info(2, "f") \~= simplelog then
+    if is_bot and debug.info(2, "f") ~= simplelog then
         return
     end
     local args = {...}
     for i, v in args do
-        if type(v) \~= "table" then
+        if type(v) ~= "table" then
             args[i] = tostring(v):gsub(identifier .. "_?", "")
         end
     end
@@ -157,7 +156,7 @@ local function evaluate_single_use_variables(r)
     local oldr = table.clone(r)
     table.clear(r)
     for _, v in oldr do
-        if v \~= nil then
+        if v ~= nil then
             insert(r, v)
         end
     end
@@ -174,10 +173,10 @@ local function evaluate_stuff(r)
             end
         end):gsub("(.)<25ms_concat_me>([_%d%a\":%(%)%[%]]+)</25ms_concat_me>(.)", function(front, varname, back)
             local res = varname:gsub('\\"', '"')
-            if front \~= '"' then
+            if front ~= '"' then
                 res = front .. '"..' .. res
             end
-            if back \~= '"' then
+            if back ~= '"' then
                 res = res .. '.."..back
             end
             return res
@@ -202,7 +201,7 @@ local function evaluate_stuff(r)
     local oldr = table.clone(r)
     table.clear(r)
     for _, v in oldr do
-        if v \~= nil then
+        if v ~= nil then
             insert(r, (v:gsub(identifier .. "_?", "")))
         end
     end
@@ -364,7 +363,7 @@ end
 local inuse = false
 local getnewvar = function(varname)
     repeat until not inuse
-    if varname and (type(varname) \~= "string" or varname:find("25ms", 1, true) or not settings.varnames) then
+    if varname and (type(varname) ~= "string" or varname:find("25ms", 1, true) or not settings.varnames) then
         varname = nil
     end
     inuse = true
@@ -406,7 +405,7 @@ local function debug_getinfo(func_or_level, lol)
     local toadd = {l = "linedefined", f = "func", s = "source", n = "namewhat", l = "istailcall", s = "short_src"}
     for opt, name in toadd do
         local value = debug_info(func_or_level, opt)
-        if value \~= nil then
+        if value ~= nil then
             info[name] = value
         end
     end
@@ -471,7 +470,7 @@ tostring_complex = function(var, ignoremt, antioverflow)
             return tablefindres
         end
         local info = debug_getinfo(var)
-        local name = info.namewhat \~= "" and info.namewhat or getglobalfuncname(var) or "\~anonymous"
+        local name = info.namewhat ~= "" and info.namewhat or getglobalfuncname(var) or "~anonymous"
         local numargs, isvararg = debug.info(var, "a")
         if settings.usesimplefunctions then return "function(...) --[[n=" .. name .. "]]end" end
         local args, argstr, varargvars, varargstr = genvars(numargs, nil, isvararg)
@@ -483,7 +482,7 @@ tostring_complex = function(var, ignoremt, antioverflow)
             is_unfinished = true
             insert(unfinishedfuncs, {func = var, args = args, varargvars = varargvars})
         end
-        local res = "function(" .. argstr .. (varargstr and ((argstr \~= "" and "," or "") .. "...") or "") .. ")\n"
+        local res = "function(" .. argstr .. (varargstr and ((argstr ~= "" and "," or "") .. "...") or "") .. ")\n"
             .. (varargstr and "local " .. varargstr .. " = ...\n" or "")
             .. (returnR and table.concat(returnR, "\n") or "-- func" .. #unfinishedfuncs)
             .. "\nend"
@@ -529,14 +528,14 @@ local tfind, plserror = table.find
 simplelog = function(varname, source, ...)
     if msecNotReady then return end
     local callargs = stringify(...)
-    local back_string = source .. (... \~= Enum_NOCALL and ("(" .. callargs .. ")") or "")
+    local back_string = source .. (... ~= Enum_NOCALL and ("(" .. callargs .. ")") or "")
     local write_string = "local " .. varname .. " =" .. back_string
     local smegstring = back_string:gsub("_([%a%d]+)_", "")
     local plus, minus, minusonerror = 140, 35, 400
     if settings.watchoutforloop and tfind(lastcouple, smegstring) and #smegstring > 3 then
         local min = 1e5 / (1 + (getheight() / 5))
         lastfound = lastfound + plus
-        if lastfound > min and varname \~= "er" then
+        if lastfound > min and varname ~= "er" then
             if lastfound > min + 1000 then
                 plserror = true
             end
@@ -564,7 +563,7 @@ local function simplemath(operator)
     return function(left, right)
         local varname = getnewvar()
         insert(currentR, "local " .. varname .. " =(" .. tostring_complex(left) .. operator .. tostring_complex(right) .. ")")
-        if operator == "==" and settings.hook_op_default_return \~= "spy" then
+        if operator == "==" and settings.hook_op_default_return ~= "spy" then
             if settings.hook_op_default_return == "original" then
                 return rawequal(left, right)
             else
@@ -591,9 +590,9 @@ local smarthook = function(funcname, original)
 end
 local spymt = {
     __index = function(_, key)
-        local varname = getnewvar((_[__25mslocation]:sub(1, 1) \~= "_" and _[__25mslocation] or "") .. (type(key) == "string" and key or "Idx"))
+        local varname = getnewvar((_[__25mslocation]:sub(1, 1) ~= "_" and _[__25mslocation] or "") .. (type(key) == "string" and key or "Idx"))
         simplelog(varname, _[__25mslocation] .. "[" .. tostring_complex(key) .. "]", Enum_NOCALL)
-        if type(key) == "string" and _25mspredefined[key] \~= nil then
+        if type(key) == "string" and _25mspredefined[key] ~= nil then
             return _25mspredefined[key]
         elseif key == "lil skid tried to dump" then
             return
@@ -611,7 +610,7 @@ local spymt = {
             insert(currentR, '_lol("<25ms: luarmor early exit>")')
             plserror = true
         end
-        local varname = getnewvar("call" .. (_[__25mslocation]:sub(1, 1) \~= "_" and _[__25mslocation] or ""))
+        local varname = getnewvar("call" .. (_[__25mslocation]:sub(1, 1) ~= "_" and _[__25mslocation] or ""))
         simplelog(varname, _[__25mslocation], ...)
         return spytbl(varname)
     end,
@@ -645,7 +644,7 @@ local spymt = {
     end,
     __len = function(_)
         local returnvalue = math.random(1e3, 1e9)
-        local varname = getnewvar("len" .. (_[__25mslocation]:sub(1, 1) \~= "_" and _[__25mslocation] or ""))
+        local varname = getnewvar("len" .. (_[__25mslocation]:sub(1, 1) ~= "_" and _[__25mslocation] or ""))
         special_replacements[returnvalue] = varname
         insert(currentR, "local " .. varname .. " =#" .. _[__25mslocation])
         return returnvalue
@@ -681,7 +680,7 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
         end
         return tbl
     end
-    if settings.hook_op \~= false then
+    if settings.hook_op ~= false then
         local log_if_needed = function(operation, a, b, actual)
             if type(a) == "context_type" or type(b) == "context_type" then
                 local varname = getnewvar()
@@ -706,7 +705,7 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
         cenv._25msGR = function(a, b) return log_if_needed(">", a, b, (function() return (a > b) end)) end
         cenv._25msLEEQ = function(a, b) return log_if_needed("<=", a, b, (function() return (a <= b) end)) end
         cenv._25msGREQ = function(a, b) return log_if_needed(">=", a, b, (function() return (a >= b) end)) end
-        cenv._25msUNEQ = function(a, b) return log_if_needed("\~=", a, b, (function() return (a \~= b) end)) end
+        cenv._25msUNEQ = function(a, b) return log_if_needed("~=", a, b, (function() return (a ~= b) end)) end
         cenv._25msEQ = function(a, b) return log_if_needed("==", a, b, (function() return (a == b) end)) end
         cenv._25msNOT = function(a) return log_if_needed("not", a, nil, (function() return (not a) end)) end
         cenv._25msLEN = function(a) return log_if_needed("#", a, nil, (function() return (#a) end)) end
@@ -762,7 +761,7 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
         cenv._25msINDEX = function(tbl)
             return setmetatable({}, {
                 __index = function(_, key)
-                    if type(tbl) \~= "context_type" and type(key) == "context_type" then
+                    if type(tbl) ~= "context_type" and type(key) == "context_type" then
                         local varname = getnewvar("idx")
                         metatables[tbl] = metatables[tbl] or {
                             mt = false,
@@ -774,7 +773,7 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
                     return tbl[key]
                 end,
                 __newindex = function(_, key, value)
-                    if type(tbl) \~= "context_type" and (type(key) == "context_type" and type(value) == "context_type") then
+                    if type(tbl) ~= "context_type" and (type(key) == "context_type" and type(value) == "context_type") then
                         metatables[tbl] = metatables[tbl] or {
                             mt = false,
                             used = false
@@ -889,7 +888,7 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
         local t = type((...))
         if t == "string" and string.sub((...), 1, 1) == "@" then
             error "Path contains unsupported"
-        elseif t \~= "context_type" and t \~= "number" and t \~= "userdata" then
+        elseif t ~= "context_type" and t ~= "number" and t ~= "userdata" then
             error("expected a ModuleScript, got " .. type((...)))
         end
         return spytbl(varname)
@@ -898,7 +897,7 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
         local og = env[name]
         cenv[name] = {}
         for i, func in og do
-            if type(func) \~= "function" then
+            if type(func) ~= "function" then
                 cenv[name][i] = func
             else
                 cenv[name][i] = function(...)
@@ -933,7 +932,7 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
         if name == "debug" then
             cenv.debug.getinfo = debug_getinfo
         end
-        if name \~= "debug" then table.freeze(cenv[name]) end
+        if name ~= "debug" then table.freeze(cenv[name]) end
     end
     cenv.Enum = spytbl("Enum")
     cenv.game = setmetatable({
@@ -986,10 +985,10 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
         return fake_file_system[path]
     end
     cenv.isfile = function(path)
-        return fake_file_system[path] \~= nil
+        return fake_file_system[path] ~= nil
     end
     cenv.isfolder = function(path)
-        return fake_file_system[path] \~= nil
+        return fake_file_system[path] ~= nil
     end
     cenv.mkdir = function(path)
         simplelog("_", "mkdir", path)
@@ -1135,7 +1134,7 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
                         end
                         settings.usesimplefunctions = not settings.usesimplefunctions and "MSEC_TRUE" or true
                         return function(src, b)
-                            local func = luau.load(settings.hook_op \~= false and hook_op(src) or src, b)
+                            local func = luau.load(settings.hook_op ~= false and hook_op(src) or src, b)
                             setfenv(func, fenv_mt)
                             return func
                         end
@@ -1181,7 +1180,7 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
                 end
                 lastlen = #currentR
                 local try = _25mspredefined[key] or tsenv[key] or cenv[key]
-                if try \~= nil then
+                if try ~= nil then
                     return try
                 elseif key == "IschooseTeam" then
                     return function() return true end
@@ -1264,7 +1263,7 @@ for i = 1, 20 do
             local obj = unfinishedfuncs[tonumber(num)]
             local s, re = pcall(analyzefunction, obj.func, {}, false, multiunpack(obj.args, obj.varargvars))
             for i, v in re do
-                if v \~= nil then
+                if v ~= nil then
                     if v:find(localname, 1, true) then
                         localused = true
                     end
@@ -1292,7 +1291,7 @@ else
     local oldr = table.clone(r)
     table.clear(r)
     for _, v in oldr do
-        if v \~= nil then
+        if v ~= nil then
             insert(r, (v:gsub(identifier .. "_?", "")))
         end
     end
