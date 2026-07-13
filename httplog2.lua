@@ -3,13 +3,14 @@ local _require = require
 local settings = {
     varnames = true,
     usesimplefunctions = false,
-    watchoutforloop = false,
+    watchoutforloop = false, -- Desactivado
     spynilglobals = true,
     hook_op = true,
     hook_op_default_return = "original",
     log_lines = false,
     better_funcs = true,
 }
+local tsenv = {} 
 local unfinishedfuncs, is_unfinished = {}, false
 local thisfunction = debug.info(1, "f")
 local specialhandle = false
@@ -1097,13 +1098,8 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
         if isjunkie then
             crackjunkie()
         end
-        local fenv_error_on = settings.hook_op and 2e8 or 2e7
         varargs, varargsstr = genvars(5)
         insert(r, "local " .. varargsstr .. " = ...")
-        local lastlen, fuck = #currentR, 0
-        local _debug = {}
-        table.foreach(debug, function(i, v) _debug[i] = v end)
-        setmetatable(_debug, {__index = {getinfo = debug_getinfo}})
         local x = 0
         fenv_mt = setmetatable({}, {
             __index = function(_, key)
@@ -1168,17 +1164,9 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
                     end
                     return env[key]
                 end
-                if #currentR == lastlen then
-                    fuck = fuck + 1
-                    if fuck > fenv_error_on * 2 then
-                        plserror = true
-                    elseif fuck > fenv_error_on then
-                        error("<25ms: infiniteloopfenv>")
-                    end
-                else
-                    fuck = 0
-                end
-                lastlen = #currentR
+
+                -- [BLOQUE DE CONTROL DE BUCLE INFALIBLE ELIMINADO TOTALMENTE AQUÍ]
+
                 local try = _25mspredefined[key] or tsenv[key] or cenv[key]
                 if try ~= nil then
                     return try
