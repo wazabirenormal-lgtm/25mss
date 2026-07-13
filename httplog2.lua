@@ -6,8 +6,8 @@ local _require=require
 local settings={
     varnames=true, -- _someName69
     usesimplefunctions=false, -- functions wont be explored if true
-    watchoutforloop=falsd, -- infinitelooperror!
-    spynilglobals=false, -- when true will spy all globals, even if they might not be a defined in a normal env
+    watchoutforloop=false, -- infinitelooperror!
+    spynilglobals=true, -- when true will spy all globals, even if they might not be a defined in a normal env
     hook_op=true, -- attempt to hook expressions like "==", "and", "or", "not" and more
     hook_op_default_return="original", -- "original", "spy", false, true
     log_lines=false,
