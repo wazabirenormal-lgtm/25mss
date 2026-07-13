@@ -2191,7 +2191,7 @@ class MyClient(discord.Client):
                     
                     await msg.reply(f"Error while dumping. Most likely an invalid script.\n```diff\n- {error_message or 'Unknown execution error'}\n```")
                     print("Dump error:\n",(result and result.stderr or "no stderr"))
-)
+
 
             if msg.content.startswith(".udump"): 
                 result, filename = await luafilehandler(msg,"unpack_dumper.lua","./dumps/original/",lune=True)
@@ -2461,4 +2461,4 @@ if __name__ == "__main__":
         print("❌ No se encontró DISCORD_TOKEN en las variables de entorno")
         exit(1)
 
-    client.run(DISCORD_TOKEN)
+    client.run(DISCORD_TOKEN))
