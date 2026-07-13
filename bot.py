@@ -2178,18 +2178,25 @@ class MyClient(discord.Client):
                     buffer.seek(0)
                     await msg.reply("Infinite loop while logging.",file=discord.File(fp=buffer, filename="error_output.lua"))
                 else:
-                    # Ahora sí procesará cualquier otro error (Sintaxis, falta de librerías, etc.)
+                    # === DEBUG MEJORADO ===
+                    debug_info = []
+                    if result:
+                        debug_info.append(f"STDOUT (first 800 chars): { (result.stdout or '')[:800] }")
+                        debug_info.append(f"STDERR (first 800 chars): { (result.stderr or '')[:800] }")
+                        debug_info.append(f"Return code: {getattr(result, 'returncode', 'N/A')}")
+                    else:
+                        debug_info.append("Result was None/False")
+                    
                     error_message = None
                     if result and result.stderr:
                         error_message = result.stderr.split("\n")[0].replace('[string "sandbox"]:','line ')
-                    elif result and "heh" in result.stdout:
-                        # Captura errores internos del sandbox que httplog2 atrapó con pcall y mandó al stdout
-                        for line in result.stdout.split("\n"):
+                    elif result and "heh" in (result.stdout or ""):
+                        for line in (result.stdout or "").split("\n"):
                             if line.startswith("heh"):
                                 error_message = line.replace("heh", "Internal Sandbox Error:")
                                 break
                     
-                    await msg.reply(f"Error while dumping. Most likely an invalid script.\n```diff\n- {error_message or 'Unknown execution error'}\n```")
+                    await msg.reply(f"Error while dumping.\n```diff\n- {error_message or 'Unknown execution error'}\n```\n**Debug info:**\n```" + "\n".join(debug_info) + "```")
                     print("Dump error:\n",(result and result.stderr or "no stderr"))
 
 
