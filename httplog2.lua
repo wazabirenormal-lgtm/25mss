@@ -3,7 +3,7 @@ local _require = require
 local settings = {
     varnames = true,
     usesimplefunctions = false,
-    watchoutforloop = false, -- Desactivado
+    watchoutforloop = true, -- Re-activado de forma segura
     spynilglobals = true,
     hook_op = true,
     hook_op_default_return = "original",
@@ -534,14 +534,26 @@ simplelog = function(varname, source, ...)
     local smegstring = back_string:gsub("_([%a%d]+)_", "")
     local plus, minus, minusonerror = 140, 35, 400
     if settings.watchoutforloop and tfind(lastcouple, smegstring) and #smegstring > 3 then
-        local min = 1e5 / (1 + (getheight() / 5))
+        local h = getheight()
+        if not h or h <= 0 then h = 10 end
+        local min = 1e5 / (1 + (h / 5))
+        if min < 2000 then min = 5000 end -- Límite mínimo de seguridad para Lune
+        
         lastfound = lastfound + plus
         if lastfound > min and varname ~= "er" then
             if lastfound > min + 1000 then
                 plserror = true
             end
             lastfound = lastfound > minusonerror and lastfound - minusonerror or 0
-            error("<25ms: infinitelooperror>")
+            
+            -- REPORTE DETALLADO 1: Bucle de logging repetitivo
+            error("\n=======================================================\n" ..
+                  "[ALERTA: BUCLE INFINITO EN SIMPLELOG DETECTADO]\n" ..
+                  "-> Operación repetida en bucle: " .. tostring(smegstring) .. "\n" ..
+                  "-> Origen/Función causante: " .. tostring(source) .. "\n" ..
+                  "-> Variable afectada: " .. tostring(varname) .. "\n" ..
+                  "-> ¿Por qué falló?: El script de WeAreDevs está llamando consecutivamente a la misma instrucción sin avanzar en la estructura. Esto se debe a una protección anti-dump o un control anti-deobfuscator activo.\n" ..
+                  "=======================================================")
         end
     else
         lastfound = lastfound > minus and lastfound - minus or 0
@@ -1098,8 +1110,13 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
         if isjunkie then
             crackjunkie()
         end
+        local fenv_error_on = settings.hook_op and 2e8 or 2e7
         varargs, varargsstr = genvars(5)
         insert(r, "local " .. varargsstr .. " = ...")
+        local lastlen, fuck = #currentR, 0
+        local _debug = {}
+        table.foreach(debug, function(i, v) _debug[i] = v end)
+        setmetatable(_debug, {__index = {getinfo = debug_getinfo}})
         local x = 0
         fenv_mt = setmetatable({}, {
             __index = function(_, key)
@@ -1164,9 +1181,24 @@ analyzefunction = function(chunk, r, lowestlayer, ...)
                     end
                     return env[key]
                 end
-
-                -- [BLOQUE DE CONTROL DE BUCLE INFALIBLE ELIMINADO TOTALMENTE AQUÍ]
-
+                if #currentR == lastlen then
+                    fuck = fuck + 1
+                    if fuck > fenv_error_on * 2 then
+                        plserror = true
+                    elseif fuck > fenv_error_on then
+                        
+                        -- REPORTE DETALLADO 2: Bucle cerrado en Entorno Virtual (Fenv)
+                        error("\n=======================================================\n" ..
+                              "[ALERTA: BUCLE INFINITO EN ENTORNO VIRTUAL DETECTADO]\n" ..
+                              "-> Última variable global consultada: " .. tostring(key) .. "\n" ..
+                              "-> Contador de spam interno: " .. tostring(fuck) .. " lecturas seguidas\n" ..
+                              "-> ¿Por qué falló?: El script objetivo ejecutó un bucle cerrado consultando la global '" .. tostring(key) .. "' millones de veces sin generar nuevas líneas de código. Esto pasa si el script detecta que está en un Sandbox (anti-cheat/anti-tamper) o si falló una condición de salida de un bucle interno.\n" ..
+                              "=======================================================")
+                    end
+                else
+                    fuck = 0
+                end
+                lastlen = #currentR
                 local try = _25mspredefined[key] or tsenv[key] or cenv[key]
                 if try ~= nil then
                     return try
