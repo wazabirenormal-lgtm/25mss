@@ -441,7 +441,7 @@ tostring_complex = function(var, ignoremt, antioverflow)
                 metatables[var].mt[i] = nil
             end
         end
-        -- CORRECCIÓN CRÍTICA: Se pasa el parámetro antioverflow para evitar bucles infinitos en metatablas cíclicas
+        -- CORRECCIÓN APLICADA: Se quita el texto huérfano y se mantiene la protección cíclica
         insert(currentR, "local " .. varname .. " = " .. (metatables[var].mt and "setmetatable(" or "") .. tostring_complex(var, true, antioverflow) .. (metatables[var].mt and "," .. tostring_complex(clonemt, false, antioverflow) .. ")" or ""))
         if clonemt then
             for i, v in clonemt do
@@ -485,7 +485,7 @@ tostring_complex = function(var, ignoremt, antioverflow)
             insert(unfinishedfuncs, {func = var, args = args, varargvars = varargvars})
         end
         local res = "function(" .. argstr .. (varargstr and ((argstr ~= "" and "," or "") .. "...") or "") .. ")\n"
-            .. (varargstr abatement and "local " .. varargstr .. " = ...\n" or "")
+            .. (varargstr and "local " .. varargstr .. " = ...\n" or "")
             .. (returnR and table.concat(returnR, "\n") or "-- func" .. #unfinishedfuncs)
             .. "\nend"
         for _ = before_unclosed, unclosed_blocks - 1 do
@@ -568,8 +568,6 @@ simplelog = function(varname, source, ...)
         if type(linenumber) == "string" then write_string = write_string .. "-- line " .. linenumber end
     end
     
-    -- MODIFICACIÓN IMPORTANTE: Se eliminó el print masivo para evitar que el hosting/bot mate el proceso por log-flood.
-    -- El código completo generado se sigue guardando perfectamente en el archivo final.
     multiinsert(currentR, write_string:split("\n"))
 end
 local function simplemath(operator)
