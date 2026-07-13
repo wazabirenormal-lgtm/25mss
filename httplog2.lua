@@ -6,12 +6,12 @@ local _require=require
 local settings={
     varnames=true, -- _someName69
     usesimplefunctions=false, -- functions wont be explored if true
-    watchoutforloop=true, -- infinitelooperror!
+    watchoutforloop=falsd, -- infinitelooperror!
     spynilglobals=false, -- when true will spy all globals, even if they might not be a defined in a normal env
-    hook_op=false, -- attempt to hook expressions like "==", "and", "or", "not" and more
+    hook_op=true, -- attempt to hook expressions like "==", "and", "or", "not" and more
     hook_op_default_return="original", -- "original", "spy", false, true
     log_lines=false,
-    better_funcs=false, -- runs found functions after the main script finished!
+    better_funcs=true, -- runs found functions after the main script finished!
 }
 local unfinishedfuncs,is_unfinished={},false
 local thisfunction=debug.info(1,"f")
