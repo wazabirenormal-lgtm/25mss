@@ -2152,7 +2152,7 @@ class MyClient(discord.Client):
                 if msg.author.id in malicious_users: print("unallowed");return await msg.reply("You are not allowed to use this command anymore :'(")
                 urlresult=None
                 whitelistedUrls=[
-                    "[https://api.junkie-development.de/api/v1/](https://api.junkie-development.de/api/v1/)"
+                    "https://api.junkie-development.de/api/v1/"
                 ]
                 if len(smsg)>1 and smsg[1].startswith("https://") and any(smsg[1].startswith(url) for url in whitelistedUrls):
                     urlresult=smsg[1]
@@ -2204,6 +2204,7 @@ class MyClient(discord.Client):
                 else:
                     await msg.reply(f"Error while dumping. Make sure the script you sent uses moonsec V3!")
                     print("Dump error:\n"+result.stderr)
+
             if msg.content.startswith(".msat"): 
                 result, filename = await luafilehandler(msg,"MSecAntiTamper.lua","./dumps/original/",lune=True)
                 if not result and not filename:
@@ -2460,5 +2461,7 @@ if __name__ == "__main__":
     if not DISCORD_TOKEN:
         print("❌ No se encontró DISCORD_TOKEN en las variables de entorno")
         exit(1)
+
+    client.run(DISCORD_TOKEN))     exit(1)
 
     client.run(DISCORD_TOKEN))
