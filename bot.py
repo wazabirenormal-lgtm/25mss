@@ -32,6 +32,16 @@ from obf_detect import detect_obf
 
 is_localhost=False
 
+# ========================================================
+# CAMBIO: Agrega estas líneas exactamente aquí abajo
+# ========================================================
+import string
+
+def randomstr(length=16):
+    characters = string.ascii_letters + string.digits
+    return ''.join(random.choice(characters) for _ in range(length))
+# ========================================================
+
 ssl_context = ssl.create_default_context(cafile=certifi.where())
 ownerid = 1134927235908911125
 ApiToken = ""
