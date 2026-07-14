@@ -2167,13 +2167,12 @@ class MyClient(discord.Client):
                         await msg.reply(f"{msg.author.mention}{webhooks and '\n'+webhooks or ''}",file=file)
                     except:
                         await msg.reply("Couldnt send file. ping 33ms to get it lol")
-                # MODIFICACIÓN: Filtrar estrictamente por errores reales de bucle infinito
-                elif result and (
-                    "infinite loop" in result.stdout.lower() or 
-                    "infiniteloop" in result.stdout.lower() or 
-                    "infiniteloop" in (result.stderr or "").lower() or 
-                    "thread 'main' has overflowed" in (result.stderr or "")
-                ):
+                                        # MODIFICACIÓN: Filtrar estrictamente por errores reales de bucle infinito o desbordamientos
+                        elif result and (
+                            "infinitelooperror" in (result.stderr or "").lower() or 
+                            "thread 'main' has overflowed" in (result.stderr or "").lower() or
+                            (not result.stderr and "infinite loop" in result.stdout.lower())
+                        ):
                     stdout_bytes = result.stdout.encode()
                     max_size = 4 * 1024 * 1024 
                     if len(stdout_bytes) > max_size:
