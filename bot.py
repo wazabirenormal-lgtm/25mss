@@ -2467,4 +2467,5 @@ if __name__ == "__main__":
         print("❌ No se encontró DISCORD_TOKEN en las variables de entorno")
         exit(1)
 
-    client.run(DISCORD_TOKEN)_TOKEN)
+    client.run(DISCORD_TOKEN)
+TOKEN)
