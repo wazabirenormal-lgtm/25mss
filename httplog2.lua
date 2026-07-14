@@ -557,8 +557,11 @@ end
 local function getheight()
     for i=0,100 do
         local res=pcall(getfenv,i)
-        if not res then return i-10 end
+        if not res then 
+            return math.max(1, i) 
+        end
     end
+    return 100
 end
 local tfind,plserror=table.find
 simplelog=function(varname,source,...)
