@@ -470,12 +470,6 @@ async def makeit_rename(inpath,outpath):
     if not renamed_code:
         print(f"makeit_rename: unexpected response {response}")
         return False
-    try:
-        with open(outpath, "w", encoding="utf-8", newline="\n") as outfile:
-            outfile.write(renamed_code)
-    except Exception as er:
-        print(f"makeit_rename write fail: {er}")
-        return False
     try:print("Rename credits left:",response.get("remainingCredits"))
     except:pass
     return True
@@ -1245,7 +1239,7 @@ command_manager.commands={
         "description":"Detect the obfuscator that a script is using",
         "cooldown":3,
     },
-    ".ibs":{
+    ".ibs": {
         "func": nonfunc,
         "description": "ib2 based obfuscation. Probably more secure than moonsec, creates big files"
     },
@@ -1459,7 +1453,7 @@ headers = {
     "sec-fetch-site": "same-origin",
     "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
     "x-discord-locale": "en-US",
-    "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE0My4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTQzLjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiIiLCJyZWZlcnJpbmdfZG9tYWluIjoiIiwicmVmZXJyZXJfY3VycmVudCI6IiIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6IiIsInJlbGVhc2VfY2hhbm5lbCI6InN0YWJsZSIsImNsaWVudF9idWlsZF9udW1iZXIiOjQ4MDU4NSwiY2xpZW50X2V2ZW50X3NvdXJjZSI6bnVsbCwiaGFzX2NsaWVudF9tb2RzIjpmYWxzZSwiY2xpZW50X2xhdW5jaF9pZCI6IjIyMzE2M2ZkLWFjZjEtNDBhNS04MTI3LTViNzg4YjZhYzc2ZiIsImxhdW5jaF9zaWduYXR1cmUiOiI4Yjc1YWRhMC1kMjU0LTQwODctOGI1Ni0yMzA0YTQzZTE1ZjMiLCJjbGllbnRfYXBwX3N0YXRlIjoiZm9jdXNlZCIsImNsaWVudF9oZWFydGJlYXRfc2Vzc2lvbl9pZCI6IjA2YmVjZDNhLTZmNTItNGNjMC1hNjVjLTQyNzI2YTA3NTBkMiJ9"
+    "x-super-properties": "eyJvcyI6IldpbmRvd3MiLCJicm93c2VyIjoiQ2hyb21lIiwiZGV2aWNlIjoiIiwic3lzdGVtX2xvY2FsZSI6ImVuLVVTIiwiYnJvd3Nlcl91c2VyX2FnZW50IjoiTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgMTAuMDsgV2luNjQ7IHg2NCkgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzE0My4wLjAuMCBTYWZhcmkvNTM3LjM2IiwiYnJvd3Nlcl92ZXJzaW9uIjoiMTQzLjAuMC4wIiwib3NfdmVyc2lvbiI6IjEwIiwicmVmZXJyZXIiOiIiLCJyZWZlcnJpbmdfZG9tYWluIjoiIiwicmVmZXJyZXJfY3VycmVudCI6IiIsInJlZmVycmluZ19kb21haW5fY3VycmVudCI6IiIsInJlbGVhc2VfY2hhbm5lbCI6InN0YWJsZSIsImNsaWVudF9idWlsZF9udW1iZXIiOjQ4MDU4NSwiY2xpZW50X2V2ZW50X3NvdXJjZSI6bnVsbCwiaGFzX2NsaWVudF9tb2RzIjpmYWxzZSwiY2xpZW50X2xhdW5jaF9pZCI6IjIyMzE2M2ZkLWFjZjEtNDBhNS04MTI3LTViNzg4YjZhYzc2ZiIsImxhdW5jaF9zaWduYXR1cmUiOiI4Yjc1YWRhMC1kMjU0LTQwODctOGI1Ni0yMzA0YTQzE1ZjMiLCJjbGllbnRfYXBwX3N0YXRlIjoiZm9jdXNlZCIsImNsaWVudF9oZWFydGJlYXRfc2Vzc2lvbl9pZCI6IjA2YmVjZDNhLTZmNTItNGNjMC1hNjVjLTQyNzI2YTA3NTBkMiJ9"
 }
 
 async def getmsgcounts(user_id):
@@ -1685,7 +1679,7 @@ async def getfile(msg, file_location=False, file_extension=".lua", usehash=False
         except:
             pass
 
-    forwarded = getattr(msg, "forwarded_messages", None) or getattr(msg, "message_snapshots", None)
+    forwarded = getattr(m, "forwarded_messages", None) or getattr(m, "message_snapshots", None)
     if forwarded:
         messages.extend(forwarded)
 
@@ -2152,7 +2146,7 @@ class MyClient(discord.Client):
                 if msg.author.id in malicious_users: print("unallowed");return await msg.reply("You are not allowed to use this command anymore :'(")
                 urlresult=None
                 whitelistedUrls=[
-                    "https://api.junkie-development.de/api/v1/"
+                    "[https://api.junkie-development.de/api/v1/](https://api.junkie-development.de/api/v1/)"
                 ]
                 if len(smsg)>1 and smsg[1].startswith("https://") and any(smsg[1].startswith(url) for url in whitelistedUrls):
                     urlresult=smsg[1]
@@ -2167,12 +2161,12 @@ class MyClient(discord.Client):
                         await msg.reply(f"{msg.author.mention}{webhooks and '\n'+webhooks or ''}",file=file)
                     except:
                         await msg.reply("Couldnt send file. ping 33ms to get it lol")
-                                        # MODIFICACIÓN: Filtrar estrictamente por errores reales de bucle infinito o desbordamientos
-                        elif result and (
-                            "infinitelooperror" in (result.stderr or "").lower() or 
-                            "thread 'main' has overflowed" in (result.stderr or "").lower() or
-                            (not result.stderr and "infinite loop" in result.stdout.lower())
-                        ):
+                # MODIFICACIÓN: Filtrar estrictamente por errores reales de bucle infinito o desbordamientos
+                elif result and (
+                    "infinitelooperror" in (result.stderr or "").lower() or 
+                    "thread 'main' has overflowed" in (result.stderr or "").lower() or
+                    (not result.stderr and "infinite loop" in result.stdout.lower())
+                ):
                     stdout_bytes = result.stdout.encode()
                     max_size = 4 * 1024 * 1024 
                     if len(stdout_bytes) > max_size:
@@ -2474,4 +2468,3 @@ if __name__ == "__main__":
         exit(1)
 
     client.run(DISCORD_TOKEN)
-
