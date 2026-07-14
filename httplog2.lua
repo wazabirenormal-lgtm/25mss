@@ -571,10 +571,13 @@ simplelog=function(varname,source,...)
     local write_string="local "..varname.." ="..back_string
     local smegstring=back_string:gsub("_([%a%d]+)_","")
     local plus,minus,minusonerror=140,35,400
-    if settings.watchoutforloop and tfind(lastcouple,smegstring) and #smegstring>3 then
+    
+    -- CAMBIO CLAVE: Los logs de error no alimentan el detector de bucles.
+    -- Al contrario, enfrían drásticamente la pila (decay masivo) para evitar falsos positivos acumulados.
+    if settings.watchoutforloop and varname ~= "er" and tfind(lastcouple,smegstring) and #smegstring>3 then
         local min=1e5/(1+(getheight()/5))
         lastfound+=plus
-        if lastfound>min and varname~="er" then
+        if lastfound>min then
             if lastfound>min+1000 then
                 plserror=true
             end
@@ -582,7 +585,8 @@ simplelog=function(varname,source,...)
             error("<25ms: infinitelooperror>")
         end
     else
-        lastfound=lastfound>minus and lastfound-minus or 0
+        local decay = (varname == "er") and minusonerror or minus
+        lastfound = lastfound > decay and lastfound - decay or 0
     end
     limitinsert(smegstring)
     if settings.log_lines then
