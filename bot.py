@@ -1679,8 +1679,8 @@ async def getfile(msg, file_location=False, file_extension=".lua", usehash=False
         except:
             pass
 
-        forwarded = getattr(msg, "forwarded_messages", None) or getattr(msg, "message_snapshots", None)
-       if forwarded:
+    forwarded = getattr(msg, "forwarded_messages", None) or getattr(msg, "message_snapshots", None)
+    if forwarded:
         messages.extend(forwarded)
 
     for m in messages:
@@ -2467,4 +2467,4 @@ if __name__ == "__main__":
         print("❌ No se encontró DISCORD_TOKEN en las variables de entorno")
         exit(1)
 
-    client.run(DISCORD_TOKEN)
+    client.run(DISCORD_TOKEN)_TOKEN)
