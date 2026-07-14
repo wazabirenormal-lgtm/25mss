@@ -1679,8 +1679,8 @@ async def getfile(msg, file_location=False, file_extension=".lua", usehash=False
         except:
             pass
 
-    forwarded = getattr(m, "forwarded_messages", None) or getattr(m, "message_snapshots", None)
-    if forwarded:
+        forwarded = getattr(msg, "forwarded_messages", None) or getattr(msg, "message_snapshots", None)
+       if forwarded:
         messages.extend(forwarded)
 
     for m in messages:
